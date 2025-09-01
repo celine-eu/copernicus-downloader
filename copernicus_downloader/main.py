@@ -5,19 +5,13 @@ from .storage import get_storage
 from .incremental import incremental_download
 from .logs import get_logger
 
-from datetime import datetime
-from typing import List
 
 logger = get_logger(__name__)
 
 
-def download_datasets(
-    config_path: str = None, dataset_name: str = None, years: List[int] = None
-):
+def download_datasets(config_path: str = None, dataset_name: str = None):
     cfg = load_config(config_path)
     storage = get_storage(cfg)
-
-    years = years if years is not None else cfg.get("years", [datetime.now().year])
 
     datasets = [dataset_name] if dataset_name else list(cfg["datasets"].keys())
 
@@ -28,7 +22,7 @@ def download_datasets(
             continue
 
         logger.info(f"Checking dataset {ds} ...")
-        incremental_download(cfg["datasets"][ds], storage, years)
+        incremental_download(cfg["datasets"][ds], storage)
 
 
 def main():

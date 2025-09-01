@@ -2,6 +2,9 @@ import os
 import boto3
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
+from .logs import get_logger
+
+logger = get_logger(__name__)
 
 
 def get_storage(cfg: Dict[str, Any]):
@@ -10,7 +13,17 @@ def get_storage(cfg: Dict[str, Any]):
     stype = storage_cfg.get("type", "fs")
 
     if stype == "fs":
-        base_dir = storage_cfg.get("base_dir", os.getenv("DATA_DIR", "./data"))
+        base_dir = os.getenv("CDS_DATA_DIR", None)
+        if base_dir:
+            logger.info(f"Using {base_dir} (CDS_DATA_DIR) for data storage")
+        else:
+            base_dir = storage_cfg.get("base_dir", None)
+            if base_dir:
+                logger.info(f"Using {base_dir} (config) for data storage")
+            else:
+                base_dir = "./data"
+                logger.info(f"Using {base_dir} (default) for data storage")
+
         return FSStorage(base_dir=base_dir)
 
     elif stype == "s3":

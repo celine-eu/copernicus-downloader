@@ -1,5 +1,3 @@
-years: [2024, 2025]
-
 storage:
   type: fs
   base_dir: ./data
@@ -10,12 +8,38 @@ storage:
 #   endpoint_url: http://localhost:9000
 
 datasets:
-  era5:
+  era5-daily:
+    name: reanalysis-era5-single-levels
+    url: https://cds.climate.copernicus.eu/api
+    key: ${CDSAPI_KEY}
+    granularity: daily
+    years: [2025]
+    min_date: 2025-08-01
+    fail_on_error: true
+    request:
+      product_type: ["reanalysis"]
+      variable:
+        - "2m_temperature"
+        - "total_precipitation"
+        - "instantaneous_10m_wind_gust"
+        - "clear_sky_direct_solar_radiation_at_surface"
+        - "cloud_base_height"
+        - "large_scale_rain_rate"
+        - "large_scale_precipitation"
+        - "large_scale_snowfall"
+        - "snowfall"
+      time: ["00:00", "06:00", "12:00", "18:00"]
+      data_format: grib
+      download_format: unarchived
+      area: [45.96, 11.11, 45.84, 11.36]
+
+  era5-monthly:
     name: reanalysis-era5-single-levels
     url: https://cds.climate.copernicus.eu/api
     key: ${CDSAPI_KEY}
     granularity: monthly
-    min_date: 2025-08-01
+    years: [2024, 2025]
+    max_date: 2025-07-31
     fail_on_error: true
     request:
       product_type: ["reanalysis"]
@@ -40,6 +64,7 @@ datasets:
     key: ${ADSAPI_KEY}
     granularity: monthly
     fail_on_error: false
+    years: [2024]
     request:
       variable: [carbon_monoxide, nitrogen_dioxide, temperature]
       pressure_level: ["1", "50", "1000"]
@@ -54,8 +79,26 @@ datasets:
     key: ${ADSAPI_KEY}
     granularity: daily
     date_format: range
-    min_date: 2025-08-01
+    years: [2025]
+    min_date: 2025-09-01
     lag_days: 1
+    fail_on_error: false
+    request:
+      "sky_type": "observed_cloud"
+      "location": { "longitude": 11.23, "latitude": 45.9 }
+      "altitude": ["1.169"]
+      "time_step": "1hour"
+      "time_reference": "true_solar_time"
+      "data_format": "csv"
+
+  cams-solar-radiation-monthly:
+    name: cams-solar-radiation-timeseries
+    url: https://ads.atmosphere.copernicus.eu/api
+    key: ${ADSAPI_KEY}
+    granularity: monthly
+    date_format: range
+    years: [2024, 2025]
+    max_date: 2025-08-31
     fail_on_error: false
     request:
       "sky_type": "observed_cloud"

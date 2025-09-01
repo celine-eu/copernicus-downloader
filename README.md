@@ -60,6 +60,8 @@ LOG_LEVEL=INFO
 
 # Optional: temporary dir for downloads
 CDS_TMPDIR=/var/tmp/cds
+# Optional: data storage path
+DATA_DIR=./data
 ```
 
 ## Configuration
