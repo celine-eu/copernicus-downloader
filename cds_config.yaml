@@ -77,6 +77,7 @@ datasets:
     name: cams-solar-radiation-timeseries
     url: https://ads.atmosphere.copernicus.eu/api
     key: ${ADSAPI_KEY}
+    file_format: csv
     granularity: daily
     date_format: range
     years: [2025]
@@ -95,6 +96,7 @@ datasets:
     name: cams-solar-radiation-timeseries
     url: https://ads.atmosphere.copernicus.eu/api
     key: ${ADSAPI_KEY}
+    file_format: csv
     granularity: monthly
     date_format: range
     years: [2024, 2025]

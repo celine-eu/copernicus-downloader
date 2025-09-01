@@ -175,6 +175,8 @@ def incremental_download(dataset_cfg, storage: Storage):
 
     tmpdir = get_tmpdir()
 
+    file_format = dataset_cfg.get("file_format", "grib")
+
     # ---- Date bounds ----
     min_date = parse_min_date(dataset_cfg.get("min_date"))
     max_date = parse_min_date(dataset_cfg.get("max_date"))
@@ -213,7 +215,7 @@ def incremental_download(dataset_cfg, storage: Storage):
             if year < start_date.year or year > end_date.year:
                 continue
 
-            key = f"{dataset}/{year}.grib"
+            key = f"{dataset}/{year}.{file_format}"
             if storage.exists(key) or already_requested(storage, key):
                 logger.debug("Skipping existing yearly file: %s", key)
                 skipped.append(key)
@@ -224,7 +226,7 @@ def incremental_download(dataset_cfg, storage: Storage):
                 if use_range
                 else {**request_template, "year": [year]}
             )
-            tmpfile = os.path.join(tmpdir, f"{year}.grib")
+            tmpfile = os.path.join(tmpdir, f"{year}.{file_format}")
 
             try:
                 logger.info("Requesting yearly data for %s: %s", dataset, year)
@@ -257,7 +259,7 @@ def incremental_download(dataset_cfg, storage: Storage):
                 ):
                     continue
 
-                key = f"{dataset}/{year}/{m}.grib"
+                key = f"{dataset}/{year}/{m}.{file_format}"
                 if storage.exists(key) or already_requested(storage, key):
                     logger.debug("Skipping existing monthly file: %s", key)
                     skipped.append(key)
@@ -266,7 +268,7 @@ def incremental_download(dataset_cfg, storage: Storage):
                 request = build_monthly_request(
                     request_template, year, m_int, use_range
                 )
-                tmpfile = os.path.join(tmpdir, f"{year}-{m}.grib")
+                tmpfile = os.path.join(tmpdir, f"{year}-{m}.{file_format}")
 
                 try:
                     logger.info(
@@ -298,14 +300,14 @@ def incremental_download(dataset_cfg, storage: Storage):
             if f"{d.day:02d}" not in request_template["day"]:
                 continue
 
-            key = f"{dataset}/{d.year}/{d.month:02d}/{d.day:02d}.grib"
+            key = f"{dataset}/{d.year}/{d.month:02d}/{d.day:02d}.{file_format}"
             if storage.exists(key) or already_requested(storage, key):
                 logger.debug("Skipping existing daily file: %s", key)
                 skipped.append(key)
                 continue
 
             request = build_request(request_template, d, use_range)
-            tmpfile = os.path.join(tmpdir, f"{d.isoformat()}.grib")
+            tmpfile = os.path.join(tmpdir, f"{d.isoformat()}.{file_format}")
 
             try:
                 logger.info("Requesting daily data for %s: %s", dataset, d.isoformat())
