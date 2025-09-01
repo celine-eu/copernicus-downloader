@@ -4,6 +4,10 @@ import cdsapi
 from datetime import date, timedelta, datetime
 import calendar
 
+import importlib
+from types import ModuleType
+from typing import Any
+
 from .storage import Storage
 from .util import save_json
 from .logs import get_logger
@@ -237,9 +241,13 @@ def incremental_download(dataset_cfg, storage: Storage):
                         break
                     else:
                         continue
+
                 save_json(f"{tmpfile}.json", request)
                 storage.save(f"{tmpfile}.json", f"{key}.json")
                 storage.save(tmpfile, key)
+
+                run_post_processing(dataset_cfg, tmpfile, key, storage)
+
                 downloaded.append(key)
             except requests.HTTPError:
                 failed.append(key)
@@ -281,9 +289,13 @@ def incremental_download(dataset_cfg, storage: Storage):
                             break
                         else:
                             continue
+
+                    run_post_processing(dataset_cfg, tmpfile, key, storage)
+
                     save_json(f"{tmpfile}.json", request)
                     storage.save(f"{tmpfile}.json", f"{key}.json")
                     storage.save(tmpfile, key)
+
                     downloaded.append(key)
                 except requests.HTTPError:
                     failed.append(key)
@@ -318,6 +330,9 @@ def incremental_download(dataset_cfg, storage: Storage):
                         break
                     else:
                         continue
+
+                run_post_processing(dataset_cfg, tmpfile, key, storage)
+
                 save_json(f"{tmpfile}.json", request)
                 storage.save(f"{tmpfile}.json", f"{key}.json")
                 storage.save(tmpfile, key)
@@ -348,3 +363,52 @@ def incremental_download(dataset_cfg, storage: Storage):
         len(failed),
     )
     return summary
+
+
+def run_post_processing(
+    dataset_cfg: dict[str, Any] | None, tmpfile: str, destfile: str, storage: Storage
+) -> Any:
+
+    post_processing: dict[str, Any] = dataset_cfg.get("post_processing", None)
+    fail_on_error: bool = dataset_cfg.get("fail_on_error", None)
+
+    if not post_processing:
+        return
+
+    module_spec = post_processing.get("module")
+    params = post_processing.get("params", {})
+
+    try:
+
+        logger.info(f"Running post_processing {module_spec}")
+
+        """
+        Dynamically load a module and run a function with params.
+
+        module_spec: "package.module:func" or just "package.module"
+        params: dictionary of keyword arguments
+        """
+        parts = module_spec.split(":")
+        module_name = parts[0]
+        func_name = parts[1] if len(parts) > 1 else None
+
+        # Import the module
+        mod: ModuleType = importlib.import_module(module_name)
+
+        # Resolve function to call
+        if func_name:
+            func = getattr(mod, func_name)
+        else:
+            # Try main or __main__
+            func = getattr(mod, "main", None)
+            if func is None:
+                raise AttributeError(
+                    f"No function provided and no main() in {module_name}"
+                )
+
+        func(tmpfile, destfile, storage, params, dataset_cfg)
+        logger.info(f"Completed post_processing {module_spec}")
+    except Exception as e:
+        if fail_on_error:
+            raise
+        logger.exception(f"Failed to invoke postprocessing {module_spec}")
