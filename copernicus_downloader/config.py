@@ -4,7 +4,7 @@ from typing import Dict, Any
 from dotenv import load_dotenv
 
 
-def load_config() -> Dict[str, Any]:
+def load_config(config_path: str = None) -> Dict[str, Any]:
     """
     Load CDS configuration from YAML.
     Priority:
@@ -16,7 +16,7 @@ def load_config() -> Dict[str, Any]:
     # Load .env into os.environ
     load_dotenv()
 
-    config_path = os.getenv("CDS_CONFIG")
+    config_path = config_path if config_path is not None else os.getenv("CDS_CONFIG")
 
     if config_path and os.path.exists(config_path):
         source = config_path
@@ -26,7 +26,7 @@ def load_config() -> Dict[str, Any]:
             source = local_path
         else:
             raise FileNotFoundError(
-                "No CDS configuration found. "
+                f"No CDS configuration found ({config_path if config_path else local_path}). "
                 "Set CDS_CONFIG env variable or place cds_config.yaml in current directory."
             )
 

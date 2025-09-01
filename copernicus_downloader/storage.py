@@ -1,7 +1,25 @@
 import os
 import boto3
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Dict, Any
+
+
+def get_storage(cfg: Dict[str, Any]):
+    """Initialize storage backend from config."""
+    storage_cfg = cfg.get("storage", {"type": "fs"})
+    stype = storage_cfg.get("type", "fs")
+
+    if stype == "fs":
+        base_dir = storage_cfg.get("base_dir", os.getenv("DATA_DIR", "./data"))
+        return FSStorage(base_dir=base_dir)
+
+    elif stype == "s3":
+        bucket = storage_cfg["bucket"]
+        endpoint = storage_cfg.get("endpoint_url")
+        return S3Storage(bucket=bucket, endpoint_url=endpoint)
+
+    else:
+        raise ValueError(f"Unknown storage type: {stype}")
 
 
 class Storage(ABC):
