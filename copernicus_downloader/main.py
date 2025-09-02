@@ -9,7 +9,7 @@ from .logs import get_logger
 logger = get_logger(__name__)
 
 
-def download_datasets(config_path: str = None, dataset_name: str = None):
+def download_datasets(config_path: str | None = None, dataset_name: str | None = None):
     cfg = load_config(config_path)
     storage = get_storage(cfg)
 
@@ -28,7 +28,7 @@ def download_datasets(config_path: str = None, dataset_name: str = None):
 def main():
     # CLI arg: dataset name, or empty = all datasets
     param = sys.argv[1] if len(sys.argv) >= 2 else None
-    download_datasets(param)
+    download_datasets(None, param)
 
 
 if __name__ == "__main__":

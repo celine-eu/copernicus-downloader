@@ -3,6 +3,9 @@ import csv
 from typing import List
 
 from copernicus_downloader.storage import Storage
+from copernicus_downloader.logs import get_logger
+
+logger = get_logger(__name__)
 
 
 def main(
@@ -63,12 +66,18 @@ def main(
         )
 
         for row in reader:
+            # removes 'nan'
+            for k, v in row.items():
+                if isinstance(v, str) and v.strip().lower() == "nan":
+                    row[k] = ""
+            # split Observation period in date_start and date_end
             obs = row.pop("Observation period", None)
             if obs and "/" in obs:
                 start_str, end_str = obs.split("/", 1)
                 # Normalize timestamps as UTC strings
-                row["start"] = start_str.replace(".0", "+00:00").replace("Z", "")
-                row["end"] = end_str.replace(".0", "+00:00").replace("Z", "")
+                row["date_start"] = start_str.replace(".0", "+00:00").replace("Z", "")
+                row["date_end"] = end_str.replace(".0", "+00:00").replace("Z", "")
+
             rows.append(row)
 
     # Build output path without duplicating extension
@@ -90,4 +99,35 @@ def main(
 
 
 if __name__ == "__main__":
-    main("cams-solar-radiation-timeseries/2025/01.csv")
+
+    from copernicus_downloader.config import load_config
+    from copernicus_downloader.storage import get_storage
+    import glob
+    import os
+
+    config_path = None
+    dataset_cfg = load_config(config_path)
+    storage = get_storage(dataset_cfg)
+
+    data_dir = os.getenv("CDS_DATA_DIR")
+
+    # all_files = glob.glob(f"{data_dir}/cams-solar-radiation-timeseries/*.csv")
+    # all_files += glob.glob(f"{data_dir}/cams-solar-radiation-timeseries/**/*.csv")
+    all_files = glob.glob(
+        f"{data_dir}/cams-solar-radiation-timeseries/**/*.csv", recursive=True
+    )
+
+    for file in all_files:
+
+        if file.find("normalized") > -1:
+            continue
+
+        logger.info(f"Processing {file}")
+
+        main(
+            tmpfile=file,
+            destfile=file,
+            dataset_cfg=dataset_cfg,
+            params={},
+            storage=storage,
+        )

@@ -117,7 +117,8 @@ def safe_retrieve(
 def build_request(request_template: dict, d: date, use_range: bool) -> dict:
     """Build request dict for a daily request."""
     if use_range:
-        day_str = d.isoformat()
+        start = (d - timedelta(days=1)).isoformat()
+        end = d.isoformat()
         # Remove year/month/day if present in template
         base = {
             k: v
@@ -126,7 +127,7 @@ def build_request(request_template: dict, d: date, use_range: bool) -> dict:
         }
         return {
             **base,
-            "date": [f"{day_str}/{day_str}"],
+            "date": [f"{start}/{end}"],
         }
     else:
         return {
