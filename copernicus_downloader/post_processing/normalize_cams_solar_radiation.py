@@ -67,8 +67,8 @@ def main(
             if obs and "/" in obs:
                 start_str, end_str = obs.split("/", 1)
                 # Normalize timestamps as UTC strings
-                row["start"] = start_str.replace(".0", "").replace("Z", "") + "Z"
-                row["end"] = end_str.replace(".0", "").replace("Z", "") + "Z"
+                row["start"] = start_str.replace(".0", "+00:00").replace("Z", "")
+                row["end"] = end_str.replace(".0", "+00:00").replace("Z", "")
             rows.append(row)
 
     # Build output path without duplicating extension
