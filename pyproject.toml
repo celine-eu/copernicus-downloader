@@ -15,4 +15,5 @@ dependencies = [
 copernicus-downloader = "copernicus_downloader.main:main"
 
 [tool.setuptools]
-packages = ["copernicus_downloader"]
+where = ["."]
+include = ["copernicus_downloader*"]
