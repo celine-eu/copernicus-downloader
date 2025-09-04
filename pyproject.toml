@@ -14,6 +14,7 @@ dependencies = [
 [project.scripts]
 copernicus-downloader = "copernicus_downloader.main:main"
 
-[tool.setuptools]
+
+[tool.setuptools.packages.find]
 where = ["."]
 include = ["copernicus_downloader*"]
