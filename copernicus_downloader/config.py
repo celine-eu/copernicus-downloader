@@ -4,7 +4,7 @@ from typing import Dict, Any
 from dotenv import load_dotenv
 
 
-def load_config(config_path: str = None) -> Dict[str, Any]:
+def load_config(config_path: str | None = None) -> Dict[str, Any]:
     """
     Load CDS configuration from YAML.
     Priority:

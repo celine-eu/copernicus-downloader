@@ -1,6 +1,6 @@
 import os
 import csv
-from typing import List
+from typing import List, Any
 
 from copernicus_downloader.storage import Storage
 from copernicus_downloader.logs import get_logger
@@ -12,8 +12,8 @@ def main(
     tmpfile: str,
     destfile: str,
     storage: Storage,
-    params: dict[str, any],
-    dataset_cfg: dict[str, any],
+    params: dict[str, Any],
+    dataset_cfg: dict[str, Any],
 ):
     """
     Normalize a CAMS Solar Radiation Service CSV file.
@@ -49,6 +49,7 @@ def main(
     rows = []
 
     with open(tmpfile, "r", encoding="utf-8") as f:
+        first_data_line = None
         for line in f:
             if line.startswith("#"):
                 header_lines.append(line.rstrip("\n"))
@@ -58,6 +59,9 @@ def main(
                 headers = header_raw.lstrip("# ").split(";")
                 first_data_line = line
                 break
+
+        if first_data_line is None:
+            raise Exception("Cannot parse CSV columns from metadata")
 
         reader = csv.DictReader(
             [first_data_line] + list(f),
