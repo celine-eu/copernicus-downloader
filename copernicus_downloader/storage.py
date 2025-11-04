@@ -90,13 +90,17 @@ class FSStorage(Storage):
 class S3Storage(Storage):
     """S3/Minio-based storage."""
 
-    def __init__(self, bucket: str, endpoint_url: str = None):
+    def __init__(self, bucket: str, endpoint_url: str | None = None):
         self.bucket = bucket
         self.s3 = boto3.client(
             "s3",
-            endpoint_url=endpoint_url,
-            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+            endpoint_url=endpoint_url
+            or os.getenv("AWS_ENDPOINT_URL")
+            or os.getenv("S3_ENDPOINT_URL"),
+            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID")
+            or os.getenv("S3_ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
+            or os.getenv("S3_SECRET_ACCESS_KEY"),
         )
 
     def exists(self, key: str) -> bool:

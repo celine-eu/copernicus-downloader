@@ -370,14 +370,18 @@ def run_post_processing(
     dataset_cfg: dict[str, Any] | None, tmpfile: str, destfile: str, storage: Storage
 ) -> Any:
 
-    post_processing: dict[str, Any] = dataset_cfg.get("post_processing", None)
-    fail_on_error: bool = dataset_cfg.get("fail_on_error", None)
+    dataset_cfg = dataset_cfg or {}
+    post_processing: dict[str, Any] | None = dataset_cfg.get("post_processing", None)
+    fail_on_error: bool | None = dataset_cfg.get("fail_on_error", None)
 
     if not post_processing:
         return
 
     module_spec = post_processing.get("module")
     params = post_processing.get("params", {})
+
+    if not module_spec or not params:
+        return
 
     try:
 

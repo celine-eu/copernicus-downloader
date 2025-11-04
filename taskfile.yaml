@@ -4,3 +4,6 @@ tasks:
   run:
     cmds:
       - uv run -m copernicus_downloader.main
+  run:s3:
+    cmds:
+      - CDS_CONFIG=./cds_config.s3.yaml AWS_ACCESS_KEY_ID=minioadmin AWS_SECRET_ACCESS_KEY=minioadmin AWS_ENDPOINT_URL=http://localhost:19000 uv run -m copernicus_downloader.main
