@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v1.1.1 (2025-11-05)
+
+### Chores
+
+- Update uv.lock
+  ([`c9f5fd1`](https://github.com/celine-eu/copernicus-downloader/commit/c9f5fd1209c5547714639a8de3eef431672d9875))
+
+- **deps**: Bump python-dotenv from 1.1.1 to 1.2.1
+  ([`12e6ddd`](https://github.com/celine-eu/copernicus-downloader/commit/12e6ddd59073c746cce53ada5b9106549206d614))
+
+- **deps**: Bump the runtime-dependencies group with 3 updates
+  ([`e7c77ae`](https://github.com/celine-eu/copernicus-downloader/commit/e7c77aef293798521ae1b0b19f615717b6c6b3d0))
+
+
 ## v1.1.0 (2025-11-05)
 
 ### Chores
