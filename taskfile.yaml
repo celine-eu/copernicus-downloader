@@ -7,3 +7,9 @@ tasks:
   run:s3:
     cmds:
       - CDS_CONFIG=./cds_config.s3.yaml AWS_ACCESS_KEY_ID=minioadmin AWS_SECRET_ACCESS_KEY=minioadmin AWS_ENDPOINT_URL=http://localhost:19000 uv run -m copernicus_downloader.main
+  release:
+    cmds:
+      # - uv lock --upgrade-package mqtt-ingestor
+      - uv run semantic-release -v version --no-vcs-release
+      - git push
+      - git push --tags

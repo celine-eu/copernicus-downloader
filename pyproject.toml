@@ -1,6 +1,6 @@
 [project]
 name = "copernicus-downloader"
-version = "0.1.0"
+version = "0.0.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -18,3 +18,20 @@ copernicus-downloader = "copernicus_downloader.main:main"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["copernicus_downloader*"]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+update_pyproject_toml = true 
+commit_parser = "conventional"
+
+[tool.semantic_release.commit_parser_options]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf", "chore"]
+parse_squash_commits = true
+ignore_merge_commits = true
+
+[dependency-groups]
+dev = [
+    "python-semantic-release>=10.4.1",
+]
+
