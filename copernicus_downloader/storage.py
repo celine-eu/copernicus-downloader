@@ -9,8 +9,8 @@ logger = get_logger(__name__)
 
 def get_storage(cfg: Dict[str, Any]):
     """Initialize storage backend from config."""
-    storage_cfg = cfg.get("storage", {"type": "fs"})
-    stype = storage_cfg.get("type", "fs")
+    storage_cfg = cfg.get("storage", {})
+    stype = os.getenv("STORAGE_TYPE", None) or storage_cfg.get("type", "fs")
 
     if stype == "fs":
         base_dir = os.getenv("CDS_DATA_DIR", None)
@@ -27,7 +27,9 @@ def get_storage(cfg: Dict[str, Any]):
         return FSStorage(base_dir=base_dir)
 
     elif stype == "s3":
-        bucket = storage_cfg["bucket"]
+        bucket = (
+            os.getenv("AWS_BUCKET") or os.getenv("S3_BUCKET") or storage_cfg["bucket"]
+        )
         endpoint = storage_cfg.get("endpoint_url")
         return S3Storage(bucket=bucket, endpoint_url=endpoint)
 
@@ -94,9 +96,11 @@ class S3Storage(Storage):
         self.bucket = bucket
         self.s3 = boto3.client(
             "s3",
-            endpoint_url=endpoint_url
-            or os.getenv("AWS_ENDPOINT_URL")
-            or os.getenv("S3_ENDPOINT_URL"),
+            endpoint_url=(
+                os.getenv("AWS_ENDPOINT_URL")
+                or os.getenv("S3_ENDPOINT_URL")
+                or endpoint_url
+            ),
             aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID")
             or os.getenv("S3_ACCESS_KEY_ID"),
             aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
