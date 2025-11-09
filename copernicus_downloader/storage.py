@@ -28,8 +28,14 @@ def get_storage(cfg: Dict[str, Any]):
 
     elif stype == "s3":
         bucket = (
-            os.getenv("AWS_BUCKET") or os.getenv("S3_BUCKET") or storage_cfg["bucket"]
+            os.getenv("AWS_BUCKET")
+            or os.getenv("S3_BUCKET")
+            or storage_cfg.get("bucket")
         )
+        if not bucket:
+            raise Exception(
+                "`bucket` is missing. Add to config or via envs AWS_BUCKET or S3_BUCKET"
+            )
         endpoint = storage_cfg.get("endpoint_url")
         return S3Storage(bucket=bucket, endpoint_url=endpoint)
 
