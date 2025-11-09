@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.2.1 (2025-11-09)
+
+### Bug Fixes
+
+- Raise error if bucket is missing
+  ([`01210b4`](https://github.com/celine-eu/copernicus-downloader/commit/01210b44d4424d07983a834b12e634d3f9652cf3))
+
+### Chores
+
+- Add pkg description
+  ([`fd39e46`](https://github.com/celine-eu/copernicus-downloader/commit/fd39e460d8b7b2c1c5b01d0b1a8e31c63bbed91a))
+
+
 ## v1.2.0 (2025-11-09)
 
 ### Features
