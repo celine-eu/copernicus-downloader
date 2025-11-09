@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.0 (2025-11-09)
+
+### Features
+
+- Add storage type env
+  ([`94b1d60`](https://github.com/celine-eu/copernicus-downloader/commit/94b1d60f46647b6fb9a319068362e0fbf01ca2ce))
+
+
 ## v1.1.1 (2025-11-05)
 
 ### Chores
