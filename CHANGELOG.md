@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.2 (2025-12-24)
+
+### Bug Fixes
+
+- Correct post processing trigger
+  ([`3c1653e`](https://github.com/celine-eu/copernicus-downloader/commit/3c1653e73c9e3a78eac31687d48e7ced6e8fa421))
+
+
 ## v1.2.1 (2025-11-09)
 
 ### Bug Fixes
