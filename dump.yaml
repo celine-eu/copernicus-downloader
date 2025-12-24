@@ -1,0 +1,8 @@
+contents:
+  - copernicus_downloader
+  - docker-compose.yaml
+  - scripts
+  - pyproject.toml
+  - taskfile.yaml
+
+output: sources.txt

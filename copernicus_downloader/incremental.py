@@ -291,11 +291,11 @@ def incremental_download(dataset_cfg, storage: Storage):
                         else:
                             continue
 
-                    run_post_processing(dataset_cfg, tmpfile, key, storage)
-
                     save_json(f"{tmpfile}.json", request)
                     storage.save(f"{tmpfile}.json", f"{key}.json")
                     storage.save(tmpfile, key)
+
+                    run_post_processing(dataset_cfg, tmpfile, key, storage)
 
                     downloaded.append(key)
                 except requests.HTTPError:
@@ -332,11 +332,12 @@ def incremental_download(dataset_cfg, storage: Storage):
                     else:
                         continue
 
-                run_post_processing(dataset_cfg, tmpfile, key, storage)
-
                 save_json(f"{tmpfile}.json", request)
                 storage.save(f"{tmpfile}.json", f"{key}.json")
                 storage.save(tmpfile, key)
+
+                run_post_processing(dataset_cfg, tmpfile, key, storage)
+
                 downloaded.append(key)
             except requests.HTTPError:
                 failed.append(key)
@@ -375,12 +376,14 @@ def run_post_processing(
     fail_on_error: bool | None = dataset_cfg.get("fail_on_error", None)
 
     if not post_processing:
+        logger.debug("Skip empty post_processing")
         return
 
     module_spec = post_processing.get("module")
     params = post_processing.get("params", {})
 
-    if not module_spec or not params:
+    if not module_spec:
+        logger.warning("Skip post_processing, empty module_spec")
         return
 
     try:

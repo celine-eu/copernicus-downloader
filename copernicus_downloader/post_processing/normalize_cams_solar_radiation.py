@@ -48,6 +48,8 @@ def main(
     headers: List[str] = []
     rows = []
 
+    logger.debug(f"Processing {tmpfile}")
+
     with open(tmpfile, "r", encoding="utf-8") as f:
         first_data_line = None
         for line in f:
@@ -99,39 +101,41 @@ def main(
             writer.writeheader()
             writer.writerows(rows)
 
+        logger.info(f"Saving post processed CSV to {out_destfile}")
         storage.save(out_tmppath, out_destfile)
+    else:
+        logger.info(f"Skipping {tmpfile}, no rows found")
 
 
 if __name__ == "__main__":
 
     from copernicus_downloader.config import load_config
     from copernicus_downloader.storage import get_storage
-    import glob
-    import os
 
-    config_path = None
-    dataset_cfg = load_config(config_path)
-    storage = get_storage(dataset_cfg)
+    cfg = load_config(None)
+    storage = get_storage(cfg)
 
-    data_dir = os.getenv("CDS_DATA_DIR")
+    prefix = "cams-solar-radiation-timeseries"
+    all_keys = storage.list(prefix)
 
-    # all_files = glob.glob(f"{data_dir}/cams-solar-radiation-timeseries/*.csv")
-    # all_files += glob.glob(f"{data_dir}/cams-solar-radiation-timeseries/**/*.csv")
-    all_files = glob.glob(
-        f"{data_dir}/cams-solar-radiation-timeseries/**/*.csv", recursive=True
-    )
+    csv_keys = [
+        k for k in all_keys if k.endswith(".csv") and "_normalized.csv" not in k
+    ]
 
-    for file in all_files:
+    logger.info("Found %d CSV files", len(csv_keys))
 
-        if file.find("normalized") > -1:
-            continue
+    for key in csv_keys:
+        try:
+            logger.info("Processing %s", key)
 
-        logger.info(f"Processing {file}")
+            local_path = storage.get_path(key)
 
-        main(
-            tmpfile=file,
-            destfile=file,
-            dataset_cfg=dataset_cfg,
-            params={},
-            storage=storage,
-        )
+            main(
+                tmpfile=local_path,  # ← always local
+                destfile=key,  # ← always logical key
+                storage=storage,
+                params={},
+                dataset_cfg=cfg,
+            )
+        except Exception:
+            logger.exception("Failed to normalize %s", key)

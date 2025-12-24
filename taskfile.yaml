@@ -12,3 +12,7 @@ tasks:
       - uv run semantic-release -v version --no-vcs-release
       - git push
       - git push --tags
+  dump-sources:
+    desc: Dump sources
+    cmds:
+      - uv run python scripts/dump_source.py
